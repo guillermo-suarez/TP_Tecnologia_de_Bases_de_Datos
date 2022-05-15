@@ -1,0 +1,6 @@
+create or replace trigger TRG_ID_EMPRESA
+before insert
+on EMPRESA for each row
+begin
+  :NEW.IDEMPRESA := SEQ_ID_EMPRESA.nextval;
+end;
