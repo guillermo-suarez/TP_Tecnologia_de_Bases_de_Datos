@@ -1,0 +1,6 @@
+create or replace trigger TRG_ID_OBRA
+before insert
+on OBRA for each row
+begin
+  :NEW.IDOBRA := SEQ_ID_OBRA.nextval;
+end;
