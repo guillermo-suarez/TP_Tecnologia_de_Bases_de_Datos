@@ -1,0 +1,6 @@
+create or replace trigger trg_id_concepto
+before insert
+on concepto for each row
+begin
+  :NEW.IDCONCEPTO := seq_id_concepto.nextval;
+end;
