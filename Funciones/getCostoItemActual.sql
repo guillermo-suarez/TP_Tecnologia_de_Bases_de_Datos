@@ -1,3 +1,5 @@
+/* Dado un idObra y un idItem, devuelve el costo del item actual + los impuestos que correspondan */
+
 create or replace function getCostoItemActual(idOb obra.idobra%type,
                               idIt item.iditem%type)
 return itemcosto.costo%type
