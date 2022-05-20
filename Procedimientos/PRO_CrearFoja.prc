@@ -1,3 +1,5 @@
+--NO ANDA
+
 CREATE OR REPLACE PROCEDURE PRO_CrearFoja (pNumObra obra.numobra%type)
 is
 vIdObra obra.idobra%type;
