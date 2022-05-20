@@ -9,7 +9,8 @@ BEGIN
   DBMS_OUTPUT.put_line('Comienzo');
   --RECUPERAR IDOBRA
   SELECT FUN_RecuperarIdObra(pNumObra) into vIdObra from DUAL;
-  DBMS_OUTPUT.put_line('Id :' + vIdObra);
+  DBMS_OUTPUT.put('Id :');
+  dbms_output.put_line(vIdObra);
   SELECT COUNT(*) INTO vConteo FROM FOJA WHERE idObra=vIdObra;
   IF vConteo != 0 THEN --hay fojas
     --RECUPERAR ULTIMA FOJA
@@ -18,10 +19,10 @@ BEGIN
     SELECT COUNT(*) INTO vConteo FROM CERTIOBRA WHERE idObra=vidObra;
     IF vConteo != 0 THEN --Hay certificados
        SELECT MAX(idFoja) INTO vIdUltimaFojaCerti FROM CERTIOBRA WHERE idObra=vidObra;
-       IF vIdUltimaFojaCerti = vIdUltimaFoja THEN --La ultima foja está certificada
+       IF vIdUltimaFojaCerti = vIdUltimaFoja THEN --La ultima foja estï¿½ certificada
           INSERT INTO FOJA
           VALUES(-1,vIdObra,CURRENT_DATE);
-       ELSE --La ultima foja no está certificada
+       ELSE --La ultima foja no estï¿½ certificada
           DBMS_OUTPUT.put_line('No se puede crear foja');
        END IF;
     ELSE --No hay certificados
@@ -32,7 +33,6 @@ BEGIN
     INSERT INTO FOJA
     VALUES(-1, vIdObra, CURRENT_DATE);
     SELECT MAX(idfoja) into vIdFojaActual FROM FOJA WHERE idobra = vIdObra;
-   -- SELECT PRO_CREARFOJADETS(vIdObra, NULL, vIdFojaActual) FROM Dual;
+    PRC_CREARFOJADETS(vIdObra, -1, vIdFojaActual);
   END IF;
 END;
-/
