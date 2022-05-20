@@ -20,6 +20,7 @@ BEGIN
     IF vConteo != 0 THEN --Hay certificados
        SELECT MAX(idFoja) INTO vIdUltimaFojaCerti FROM CERTIOBRA WHERE idObra=vidObra;
        IF vIdUltimaFojaCerti = vIdUltimaFoja THEN --La ultima foja est� certificada
+       --VERIFICAR SI ESTA CERRADA
           INSERT INTO FOJA
           VALUES(-1,vIdObra,CURRENT_DATE);
        ELSE --La ultima foja no est� certificada
