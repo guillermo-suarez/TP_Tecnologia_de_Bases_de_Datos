@@ -12,8 +12,7 @@ is vResultado number(1);
    vAbiertoCP certipago.abierto%type;
 begin
   vResultado := 0;
-  select /*co.idobra, co.nrocertificado, */count(*)
-  into /*vIdObraCO, vNroCertif, */vConteo from certiobra co where co.idfoja = pIdFoja;
+  select count(*) into vConteo from certiobra co where co.idfoja = pIdFoja;
   if vConteo > 0 then
     vResultado := 1;
     select cp.abierto into vAbiertoCP from certipago cp
