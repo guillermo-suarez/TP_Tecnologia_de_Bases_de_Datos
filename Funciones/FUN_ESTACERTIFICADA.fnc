@@ -1,9 +1,9 @@
-/* A partir de un idFoja, esta función retorna TRUE si ese idFoja aparece en al menos un CERTIOBRA
-                                               FALSE si ese idFoja NO aparece en ningún CERTIOBRA
+/* A partir de un idFoja, esta funciÃ³n retorna TRUE si ese idFoja aparece en al menos un CERTIOBRA
+                                               FALSE si ese idFoja NO aparece en ningÃºn CERTIOBRA
 Es decir, TRUE si la Foja con ese idFoja ya fue certificada y
-          FALSE si la Foja con ese idFoja todavía no fué certificada */
+          FALSE si la Foja con ese idFoja todavÃ­a no fuÃ© certificada */
 
-create or replace noneditionable function FUN_ESTACERTIFICADA(pIdFoja foja.idfoja%type)
+create or replace function FUN_ESTACERTIFICADA(pIdFoja foja.idfoja%type)
 return boolean
 is vResultado boolean;
    vConteo number(5);
