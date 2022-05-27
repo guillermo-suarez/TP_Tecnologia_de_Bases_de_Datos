@@ -8,18 +8,16 @@ Es decir, 0 si la Foja con ese idFoja no fue certificada y
 create or replace function FUN_ESTACERTIFICADA(pIdFoja foja.idfoja%type)
 return number
 is vResultado number(1);
-   vIdObraCO obra.idobra%type;
-   vNroCertif certipago.nrocertificado%type;
    vConteo number(5);
    vAbiertoCP certipago.abierto%type;
 begin
   vResultado := 0;
-  select co.idobra, co.nrocertificado, count(*)
-  into vIdObraCO, vNroCertif, vConteo from certiobra co where co.idfoja = pIdFoja;
+  select /*co.idobra, co.nrocertificado, */count(*)
+  into /*vIdObraCO, vNroCertif, */vConteo from certiobra co where co.idfoja = pIdFoja;
   if vConteo > 0 then
     vResultado := 1;
     select cp.abierto into vAbiertoCP from certipago cp
-    where (cp.idobra = vIdObraCO and cp.nrocertificado = vNroCertif);
+    inner join certiobra co on (co.idobra = cp.idobra and co.nrocertificado = cp.nrocertificado);
     if vAbiertoCP = 0 then
       vResultado := 2;
     end if;
