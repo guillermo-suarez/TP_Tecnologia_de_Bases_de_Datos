@@ -1,7 +1,9 @@
-/* A partir de un idFoja, esta función retorna TRUE si ese idFoja aparece en al menos un CERTIOBRA
-                                               FALSE si ese idFoja NO aparece en ningún CERTIOBRA
-Es decir, TRUE si la Foja con ese idFoja ya fue certificada y
-          FALSE si la Foja con ese idFoja todavía no fué certificada */
+/* A partir de un idFoja, esta función retorna 0 si ese idFoja NO aparece en ningún CERTIOBRA
+                                               1 si ese idFoja aparece en al menos un CERTIOBRA
+                                               2 si ese idFoja aparece en el menos un CERTIOBRA y, el CERTIPAGO que referencia esa CERTIOBRA, está cerrado
+Es decir, 0 si la Foja con ese idFoja no fue certificada y
+          1 si la Foja con ese idFoja fue certificada, pero ese certificado todavía no está cerrado
+          2 si la Foja con ese idFoja fue certificada, y el certificado ya se cerró */
 
 create or replace function FUN_ESTACERTIFICADA(pIdFoja foja.idfoja%type)
 return number
