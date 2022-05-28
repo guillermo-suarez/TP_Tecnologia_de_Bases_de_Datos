@@ -1,0 +1,31 @@
+CREATE OR REPLACE PROCEDURE PRC_DIFMONTO (
+       pNumObra IN obra.nomobra%type,
+       pFechaBusq IN redeterminacion.fechadesde%type
+)
+AS
+       vIdObra obra.idobra%type;
+       vMontoBase itemcosto.costo%type;
+       vMontoRedet itemcosto.costo%type;
+       vIdRedet redeterminacion.idredeterminacion%type;
+       vTotal itemcosto.costo%type;
+
+BEGIN
+  SELECT fun_getidobra(pNumObra) INTO vIdObra FROM dual;
+  IF vIdObra > 0 THEN --Existe una obra con el número de obra seleccionado
+    SELECT fun_gettotalitemsbasico(vIdObra) INTO vMontoBase FROM dual;
+    dbms_output.put_line('Numero de obra: '||pNumObra);
+    dbms_output.put_line('Fecha buscada: '||pFechaBusq);
+    dbms_output.put_line('Monto original: '||vMontoBase);
+    SELECT fun_consultafecharedet(vIdObra, pFechaBusq) INTO vIdRedet FROM dual;
+    IF vIdRedet > 0 THEN --Existe una redeterminacion en la fecha seleccionada
+      SELECT fun_gettotalitemsredeterminado(vIdObra,vIdRedet) INTO vMontoRedet FROM dual;
+      vTotal := vMontoRedet - vMontoBase;
+      dbms_output.put_line('Monto redeterminado: '||vMontoRedet);
+      dbms_output.put_line('Diferencia: '||vTotal);
+    ELSE
+      dbms_output.put_line('La obra buscada no tiene una redeterminacion en dicha fecha');
+    END IF;
+  ELSE
+    dbms_output.put_line('Numero de obra incorrecto');
+  END IF;
+END;
