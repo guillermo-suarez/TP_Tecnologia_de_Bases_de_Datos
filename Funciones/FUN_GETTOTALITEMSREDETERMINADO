@@ -1,0 +1,16 @@
+CREATE OR REPLACE FUNCTION FUN_GETTOTALITEMSREDETERMINADO(
+       pIdObra obra.idobra%type,
+       pIdRedet redeterminacion.idredeterminacion%type
+)
+RETURN itemcosto.costo%type
+IS
+vTotal itemcosto.costo%type;
+
+
+BEGIN
+  SELECT SUM(fun_getcostoitemredeterminado(o.idobra, i.iditem, pIdRedet)) INTO vTotal FROM obra o
+          INNER JOIN item i ON i.idobra = o.idobra
+  WHERE o.idobra = pIdObra
+  GROUP BY o.idobra;
+  RETURN vTotal;
+END;
