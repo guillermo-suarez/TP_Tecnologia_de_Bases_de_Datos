@@ -1,0 +1,17 @@
+CREATE OR REPLACE FUNCTION FUN_CONSULTAFECHAREDET(pIdObra obra.idobra%type,
+                              pFechaBusq redeterminacion.fechadesde%type)
+RETURN redeterminacion.idredeterminacion%type
+IS
+       vIdRedet redeterminacion.idredeterminacion%type;
+BEGIN
+       SELECT DISTINCT r.idredeterminacion INTO vIdRedet
+       FROM itemcosto ic
+            inner join redeterminacion r on ic.idredeterminacion = r.idredeterminacion
+       WHERE
+            ic.idobra = pIdObra AND pFechaBusq BETWEEN r.fechadesde AND r.fechahasta;
+RETURN vIdRedet;
+EXCEPTION --Si no encuentra, devuelve el ID base
+  WHEN no_data_found THEN
+  vIdRedet := 0;
+  RETURN vIdRedet;
+END;
