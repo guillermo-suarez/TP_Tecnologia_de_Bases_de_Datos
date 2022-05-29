@@ -2,7 +2,7 @@ CREATE OR REPLACE PROCEDURE PRC_CREARFOJA(pNumObra obra.numobra%type)
 is
 vIdObra obra.idobra%type;
 vIdUltimaFoja foja.idfoja%type;
-vHayCerti boolean;
+vHayCerti number;
 BEGIN
   DBMS_OUTPUT.put_line('Comienzo');
   --RECUPERAR IDOBRA
@@ -11,7 +11,7 @@ BEGIN
   IF vIdUltimaFoja != (-1) THEN --hay fojas    
     --VER SI LA ULTIMA FOJA ESTA CERTIFICADA
     vHayCerti := FUN_ESTACERTIFICADA(vIdUltimaFoja);
-    IF vHayCerti THEN --Esta certificada       
+    IF vHayCerti = 2 THEN --Esta certificada y cerrada       
           INSERT INTO FOJA
           VALUES(-1,vIdObra,CURRENT_DATE);
           PRC_CREARFOJADETS(vIdObra, vIdUltimaFoja, SEQ_ID_FOJA.CURRVAL);

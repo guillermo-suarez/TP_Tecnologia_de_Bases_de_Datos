@@ -14,7 +14,7 @@ BEGIN
   SELECT fun_getultimoidfoja(vIdObra) INTO vIdFoja FROM DUAL;
   --Vemos si la ultima foja esta certificada
   vHayCerti := fun_estacertificada(vIdFoja);
-  IF vHayCerti = 0 THEN --Si no está certificada
+  IF vHayCerti = 0 THEN --Si no estï¿½ certificada
      --Vemos si hay campos vacios
      vVacio := FUN_FOJAESTAVACIA(vIdFoja);   
      if vVacio then
