@@ -16,7 +16,8 @@ begin
           select fd.avaacuanterior into vAvaAcuAnterior from fojadet fd where (fd.idfoja = vUltimoIdFoja and fd.iditem = pIdItem);
           if ((vAvaAcuAnterior + pPorcAvanz) <= 100.00) then
             update fojadet fd
-            set fd.avaactual = pPorcAvanz
+            set fd.avaactual = pPorcAvanz, 
+                fd.monto = fun_getultimocostoitem(pIdObra, pIdItem) * (pPorcAvanz/100)
             where fd.idfoja = vUltimoIdFoja and fd.iditem = pIdItem;
             pError := 0; /* El update se hizo correctamente */
           else
