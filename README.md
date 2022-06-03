@@ -1,4 +1,4 @@
-# TP Final - Tecnologia de Bases de Datos
+# TP Final - Tecnología de Bases de Datos
 
 ⚠ RECORDAR: en la esquina superior izquierda de este documento se encuentra el índice de contenidos ⚠
 
