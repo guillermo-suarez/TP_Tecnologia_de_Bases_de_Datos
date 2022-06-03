@@ -3,7 +3,7 @@
 ⚠ RECORDAR: en la esquina superior izquierda de este documento se encuentra el índice de contenidos ⚠
 
 ## Grupo de Trabajo
-- Andruszyszyn, Emanuel -
+- Andruszyszyn, Emanuel - 67118
 - Malazotto, Soledad - 67120
 - Mezio, Santiago - 67156
 - Suarez, Guillermo - 67124
