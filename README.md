@@ -54,7 +54,7 @@ En general, todas las tablas caen en una de tres categorías:
 - Para cargar datos a las tablas, utilizar los scripts enumerados en la carpeta [Tablas/Datos](https://github.com/guillermo-suarez/TP_Tecnologias_Bases_de_Datos/tree/main/Tablas/Datos). Respetar el orden por la enumeración de los scripts.
 
 ### Propuesta de Solución al problema planteado en el Diseño de la BD
-Ver aclaraciones >> cambios al modelo.
+Ver aclaraciones >> [cambios al modelo](https://github.com/guillermo-suarez/TP_Tecnologias_Bases_de_Datos#cambios-al-modelo).
 
 ### Mecanismo de LOG para INSERT, UPDATE y DELETE para todas las tablas
 - Para crear todas las tablas a utilizar como LOGs, utilizar [CrearTodasLasTablasLOGs.sql](https://github.com/guillermo-suarez/TP_Tecnologias_Bases_de_Datos/blob/main/Tablas/LOGs/CrearTodasLasTablasLOGs.sql).
