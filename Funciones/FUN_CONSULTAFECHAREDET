@@ -4,11 +4,18 @@ RETURN redeterminacion.idredeterminacion%type
 IS
        vIdRedet redeterminacion.idredeterminacion%type;
 BEGIN
-       SELECT DISTINCT r.idredeterminacion INTO vIdRedet
+       SELECT MAX (r.idredeterminacion) INTO vIdRedet --Consulta si tiene una redeterminación actual
        FROM itemcosto ic
             inner join redeterminacion r on ic.idredeterminacion = r.idredeterminacion
        WHERE
+            ic.idobra = pIdObra AND r.fechahasta IS null AND r.fechadesde < pFechaBusq;
+       IF vIdRedet IS null THEN --Si no hay redeterminación abierta, se busca por fechas entre
+          SELECT DISTINCT r.idredeterminacion INTO vIdRedet
+          FROM itemcosto ic
+            inner join redeterminacion r on ic.idredeterminacion = r.idredeterminacion
+          WHERE
             ic.idobra = pIdObra AND pFechaBusq BETWEEN r.fechadesde AND r.fechahasta;
+       END IF;
 RETURN vIdRedet;
 EXCEPTION --Si no encuentra, devuelve el ID base
   WHEN no_data_found THEN
