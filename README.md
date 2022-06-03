@@ -1,4 +1,7 @@
 # TP Final - Tecnologias Bases de Datos
+
+⚠ RECORDAR: en la esquina superior izquierda de este documento se encuentra el índice de contenidos ⚠
+
 ## Grupo de Trabajo
 - Andruszyszyn, Emanuel -
 - Malazotto, Soledad - 67120
@@ -80,4 +83,13 @@ select fun_getavanceobra(4800) as "Avance" from dual;
 ```
 
 ### CONSULTA: monto de contrato básico, redeterminado (según fecha de consulta) y la diferencia entre ambos
-Utilizar [PRC_DIFMONTO](https://github.com/guillermo-suarez/TP_Tecnologias_Bases_de_Datos/blob/main/Procedimientos/PRC_DIFMONTO), indicando el NUMOBRA (**NO el IDOBRA**) de la OBRA y la fecha a considerar para el cálculo del monto redeterminado. Este procedimiento muestra en la consola de salida ("Output" en PL/SQL) el monto básico (cuanto costaba el 100% de la obra inicialmente), el monto redeterminado (cuanto costaría hacer el 100% de la obra en la fecha de consulta) si existiese y la diferencia entre estos dos.
+Utilizar [PRC_DIFMONTO](https://github.com/guillermo-suarez/TP_Tecnologias_Bases_de_Datos/blob/main/Procedimientos/PRC_DIFMONTO), indicando el NUMOBRA (**NO el IDOBRA**) de la OBRA y la fecha a considerar para el cálculo del monto redeterminado. Este procedimiento muestra en la consola de salida ("Output" en PL/SQL) el monto básico (cuanto costaba el 100% de la obra inicialmente), el monto redeterminado (cuanto costaría hacer el 100% de la obra en la fecha de consulta) si existiese y la diferencia entre estos dos. Tener en cuenta los demás objetos que dicho procedimiento utiliza (funciones, otros procedimientos, secuencias, etcétera).
+
+A continuación, un ejemplo de como ejecutar dicha función:
+
+```
+/* Consulto los montos de la OBRA con NUMOBRA = 4800 (IDOBRA = 10100) el 3 de Junio de 2022 */
+begin
+  prc_difmonto(4800, to_date('03-06-2022', 'dd-mm-yyyy'));
+end;
+```
