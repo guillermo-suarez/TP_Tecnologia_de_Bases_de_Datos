@@ -50,7 +50,7 @@ En general, todas las tablas caen en una de tres categorías:
 ### Base de Datos Creada con los datos dados.
 - Para crear las tablas, utilizar [CrearTodasLasTablas.sql](https://github.com/guillermo-suarez/TP_Tecnologias_Bases_de_Datos/blob/main/Tablas/Datos/CrearTodasLasTablas.sql). Este script crea las tablas con el [diseño dado en clase](https://campusvirtual.ugd.edu.ar/moodle/mod/resource/view.php?id=101225).
 - En caso de ya tener creadas las tablas, se deberá ejecutar [BorrarTodasLasTablas.sql](https://github.com/guillermo-suarez/TP_Tecnologias_Bases_de_Datos/blob/main/Tablas/Datos/BorrarTodasLasTablas.sql) antes.
-- Con las tablas creadas, deberá realizar los cambios aclarados más arriba.
+- Con las tablas creadas, deberá realizar los cambios aclarados en aclaraciones >> [cambios al modelo](https://github.com/guillermo-suarez/TP_Tecnologia_de_Bases_de_Datos#cambios-al-modelo).
 - Para cargar datos a las tablas, utilizar los scripts enumerados en la carpeta [Tablas/Datos](https://github.com/guillermo-suarez/TP_Tecnologias_Bases_de_Datos/tree/main/Tablas/Datos). Respetar el orden por la enumeración de los scripts.
 
 ### Propuesta de Solución al problema planteado en el Diseño de la BD
