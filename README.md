@@ -21,6 +21,7 @@ En FOJADET:
 
 ### Sobre IDs autoincrementales
 En general, todas las tablas caen en una de tres categorías:
+
 **No tienen ID autoincremental:** son las tablas cuya clave primaria esta compuesta totalmente por clave foráneas y, por lo tanto, no son autoincrementales. Estas tablas son:
 - CONCEPTOSXCERTIF
 - CONCEPTOSXOBRA
@@ -33,14 +34,14 @@ En general, todas las tablas caen en una de tres categorías:
 - ITEM
 
 **Tiene ID autoincremental independiente:** son las tablas que tienen una clave primaria simple y numérica y que, por lo tanto, pueden ser implementados mediante secuencias. Las tablas que utilizan secuencias para sus IDs y sus respectivas secuencias son:
-- CONCEPTO usa [SEQ_ID_CONCEPTO](https://github.com/guillermo-suarez/TP_Tecnologias_Bases_de_Datos/blob/main/Secuencias/SEQ_ID_CONCEPTO).
-- EMPRESA usa [SEQ_ID_EMPRESA](https://github.com/guillermo-suarez/TP_Tecnologias_Bases_de_Datos/blob/main/Secuencias/SEQ_ID_EMPRESA).
-- FOJA usa [SEQ_ID_FOJA](https://github.com/guillermo-suarez/TP_Tecnologias_Bases_de_Datos/blob/main/Secuencias/SEQ_ID_FOJA.sql).
-- LOCALIDAD usa [SEQ_ID_LOCALIDAD](https://github.com/guillermo-suarez/TP_Tecnologias_Bases_de_Datos/blob/main/Secuencias/SEQ_ID_LOCALIDAD.sql).
-- OBRA usa [SEQ_ID_OBRA](https://github.com/guillermo-suarez/TP_Tecnologias_Bases_de_Datos/blob/main/Secuencias/SEQ_ID_OBRA).
-- REDETERMINACION usa [SEQ_ID_REDETERMINACION](https://github.com/guillermo-suarez/TP_Tecnologias_Bases_de_Datos/blob/main/Secuencias/SEQ_ID_REDETERMINACION.sql).
-- TIPOCONTRATACION usa [SEQ_ID_TIPOCONTRATACION](https://github.com/guillermo-suarez/TP_Tecnologias_Bases_de_Datos/blob/main/Secuencias/SEQ_ID_TIPOCONTRATACION.sql).
-- TIPOITEM usa [SEQ_ID_TIPOITEM](https://github.com/guillermo-suarez/TP_Tecnologias_Bases_de_Datos/blob/main/Secuencias/SEQ_ID_TIPOITEM.sql).
+- CONCEPTO usa [SEQ_ID_CONCEPTO](https://github.com/guillermo-suarez/TP_Tecnologias_Bases_de_Datos/blob/main/Secuencias/SEQ_ID_CONCEPTO) con su respectivo [TRG_ID_CONCEPTO](https://github.com/guillermo-suarez/TP_Tecnologias_Bases_de_Datos/blob/main/Triggers/TRG_ID_CONCEPTO).
+- EMPRESA usa [SEQ_ID_EMPRESA](https://github.com/guillermo-suarez/TP_Tecnologias_Bases_de_Datos/blob/main/Secuencias/SEQ_ID_EMPRESA) con su respectivo [TRG_ID_EMPRESA](https://github.com/guillermo-suarez/TP_Tecnologias_Bases_de_Datos/blob/main/Triggers/TRG_ID_EMPRESA).
+- FOJA usa [SEQ_ID_FOJA](https://github.com/guillermo-suarez/TP_Tecnologias_Bases_de_Datos/blob/main/Secuencias/SEQ_ID_FOJA.sql) con su respectivo [TRG_ID_FOJA](https://github.com/guillermo-suarez/TP_Tecnologias_Bases_de_Datos/blob/main/Triggers/TRG_ID_FOJA.sql).
+- LOCALIDAD usa [SEQ_ID_LOCALIDAD](https://github.com/guillermo-suarez/TP_Tecnologias_Bases_de_Datos/blob/main/Secuencias/SEQ_ID_LOCALIDAD.sql) con su respectivo [TRG_ID_LOCALIDAD](https://github.com/guillermo-suarez/TP_Tecnologias_Bases_de_Datos/blob/main/Triggers/TRG_ID_LOCALIDAD.sql).
+- OBRA usa [SEQ_ID_OBRA](https://github.com/guillermo-suarez/TP_Tecnologias_Bases_de_Datos/blob/main/Secuencias/SEQ_ID_OBRA) con su respectivo [TRG_ID_OBRA](https://github.com/guillermo-suarez/TP_Tecnologias_Bases_de_Datos/blob/main/Triggers/TRG_ID_OBRA).
+- REDETERMINACION usa [SEQ_ID_REDETERMINACION](https://github.com/guillermo-suarez/TP_Tecnologias_Bases_de_Datos/blob/main/Secuencias/SEQ_ID_REDETERMINACION.sql) con su respectivo [TRG_ID_REDETERMINACION](https://github.com/guillermo-suarez/TP_Tecnologias_Bases_de_Datos/blob/main/Triggers/TRG_ID_REDETERMINACION.sql).
+- TIPOCONTRATACION usa [SEQ_ID_TIPOCONTRATACION](https://github.com/guillermo-suarez/TP_Tecnologias_Bases_de_Datos/blob/main/Secuencias/SEQ_ID_TIPOCONTRATACION.sql) con su respectivo [TRG_ID_TIPOCONTRATACION](https://github.com/guillermo-suarez/TP_Tecnologias_Bases_de_Datos/blob/main/Triggers/TRG_ID_TIPOCONTRATACION.sql).
+- TIPOITEM usa [SEQ_ID_TIPOITEM](https://github.com/guillermo-suarez/TP_Tecnologias_Bases_de_Datos/blob/main/Secuencias/SEQ_ID_TIPOITEM.sql) con su respectivo [TRG_ID_TIPOITEM](https://github.com/guillermo-suarez/TP_Tecnologias_Bases_de_Datos/blob/main/Triggers/TRG_ID_TIPOITEM.sql).
 
 ## Instrucciones para la Primer Entrega
 ### Base de Datos Creada con los datos dados.
@@ -51,6 +52,32 @@ En general, todas las tablas caen en una de tres categorías:
 
 ### Propuesta de Solución al problema planteado en el Diseño de la BD
 Ver aclaraciones >> cambios al modelo.
+
 ### Mecanismo de LOG para INSERT, UPDATE y DELETE para todas las tablas
 - Para crear todas las tablas a utilizar como LOGs, utilizar [CrearTodasLasTablasLOGs.sql](https://github.com/guillermo-suarez/TP_Tecnologias_Bases_de_Datos/blob/main/Tablas/LOGs/CrearTodasLasTablasLOGs.sql).
-- Para crear todos los 
+- Para crear todos y cada uno de los triggers necesarios para mantener correctamente los LOGs, utilizar los scripts en la carpeta [Triggers](https://github.com/guillermo-suarez/TP_Tecnologias_Bases_de_Datos/tree/main/Triggers).
+
+### Generación de la Foja de Medición para una Obra en particular
+Utilizar [PRC_CREARFOJA](https://github.com/guillermo-suarez/TP_Tecnologias_Bases_de_Datos/blob/main/Procedimientos/PRC_CREARFOJA.prc), indicando el NUMOBRA (**NO el IDOBRA**) de la OBRA a crear su FOJA con sus FOJADET correspondientes. Prestar atención a la consola de salida ("Output" en PL/SQL) para ver posibles mensajes de error o de confirmación. En el código fuente de dicho procedimiento están aclaradas los posibles casos excepcionales de error en donde no se debe crear la foja. Tener en cuenta los demás objetos que dicho procedimiento utiliza (funciones, otros procedimientos, secuencias, etcétera).
+
+A continuación, un ejemplo de como ejecutar dicho procedimiento:
+
+```
+/* Creo una foja para la OBRA con NUMOBRA = 4800 (IDOBRA = 10100) */
+begin
+  prc_crearfoja(4800);
+end;
+```
+
+### CONSULTA: avance de obra (en porcentaje) por NUMOBRA
+Utilizar [FUN_GETAVANCEOBRA](https://github.com/guillermo-suarez/TP_Tecnologias_Bases_de_Datos/blob/main/Funciones/FUN_GETAVANCEOBRA.fnc), indicando el NUMOBRA (**NO el IDOBRA**) de la OBRA a consultar su porcentaje de obra terminado. Tener en cuenta los demás objetos que dicha función utiliza (otras funciones, procedimientos, secuencias, etcétera).
+
+A continuación, un ejemplo de como ejecutar dicha función:
+
+```
+/* Consulto el porcentaje de avance de la OBRA con NUMOBRA = 4800 (IDOBRA = 10100) */
+select fun_getavanceobra(4800) as "Avance" from dual;
+```
+
+### CONSULTA: monto de contrato básico, redeterminado (según fecha de consulta) y la diferencia entre ambos
+Utilizar [PRC_DIFMONTO](https://github.com/guillermo-suarez/TP_Tecnologias_Bases_de_Datos/blob/main/Procedimientos/PRC_DIFMONTO), indicando el NUMOBRA (**NO el IDOBRA**) de la OBRA y la fecha a considerar para el cálculo del monto redeterminado. Este procedimiento muestra en la consola de salida ("Output" en PL/SQL) el monto básico (cuanto costaba el 100% de la obra inicialmente), el monto redeterminado (cuanto costaría hacer el 100% de la obra en la fecha de consulta) si existiese y la diferencia entre estos dos.
