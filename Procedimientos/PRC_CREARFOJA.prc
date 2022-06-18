@@ -1,10 +1,9 @@
-CREATE OR REPLACE NONEDITIONABLE PROCEDURE PRC_CREARFOJA(pNumObra obra.numobra%type,
+CREATE OR REPLACE PROCEDURE PRC_CREARFOJA(pNumObra obra.numobra%type,
                                                          pError OUT number)
 is
 vIdObra obra.idobra%type;
 vIdUltimaFoja foja.idfoja%type;
 vHayCerti number;
-vError number;
 BEGIN
   -- RECUPERAR IDOBRA
   vIdObra := FUN_GETIdObra(pNumObra);
@@ -19,21 +18,21 @@ BEGIN
         VALUES(-1,vIdObra,CURRENT_DATE);
         PRC_CREARFOJADETS(vIdObra, vIdUltimaFoja, SEQ_ID_FOJA.CURRVAL);
         commit;
-        vError := 0; -- Todo bien
+        pError := 0; -- Todo bien
       ELSIF vHayCerti = 1 then --La ultima FOJA esta certificada, pero el CERTIPAGO no esta cerrado
-        vError := 2; -- La última FOJA de esa OBRA esta certificada, pero el CERTIPAGO sigue abierto
+        pError := 2; -- La última FOJA de esa OBRA esta certificada, pero el CERTIPAGO sigue abierto
       ELSE --La última FOJA no esta certificada
-        vError := 3; -- La última FOJA de esa OBRA no esta certificada
+        pError := 3; -- La última FOJA de esa OBRA no esta certificada
       END IF;
     ELSE -- La obra no tiene fojas, se asume que se puede crear la foja
       INSERT INTO FOJA
       VALUES(-1, vIdObra, CURRENT_DATE);
       PRC_CREARFOJADETS(vIdObra, -1, SEQ_ID_FOJA.CURRVAL);
       commit;
-      vError := 0; -- Todo bien
+      pError := 0; -- Todo bien
     END IF;
   else
-    vError := 1; -- No existe OBRA con ese NUMOBRA
+    pError := 1; -- No existe OBRA con ese NUMOBRA
   end if;
 END;
 
