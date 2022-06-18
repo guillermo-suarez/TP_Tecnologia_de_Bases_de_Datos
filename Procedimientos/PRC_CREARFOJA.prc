@@ -12,8 +12,7 @@ BEGIN
     IF vIdUltimaFoja != (-1) THEN --hay fojas    
       --VER SI LA ULTIMA FOJA ESTA CERTIFICADA
       vHayCerti := FUN_ESTACERTIFICADA(vIdUltimaFoja);
-      IF vHayCerti = 2 THEN --La última FOJA esta certificada y cerrada  
-        dbms_output.put_line('FOJA creada correctamente');
+      IF vHayCerti = 2 THEN --La última FOJA esta certificada y cerrada
         INSERT INTO FOJA
         VALUES(-1,vIdObra,CURRENT_DATE);
         PRC_CREARFOJADETS(vIdObra, vIdUltimaFoja, SEQ_ID_FOJA.CURRVAL);
