@@ -27,6 +27,5 @@ BEGIN
               end loop;
               close detallesFoja; --cerramos el cursor
               END;
-   commit;
 END;
 /
