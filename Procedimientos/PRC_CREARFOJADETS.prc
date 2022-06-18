@@ -1,4 +1,4 @@
-CREATE OR REPLACE PROCEDURE PRC_CREARFOJADETS(pIdObra obra.idobra%type, pIdFojaAnterior foja.idfoja%type, pIdFojaActual foja.idfoja%type)
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE PRC_CREARFOJADETS(pIdObra obra.idobra%type, pIdFojaAnterior foja.idfoja%type, pIdFojaActual foja.idfoja%type)
 IS
 vAvance fojadet.avaacuanterior%type;
 BEGIN
@@ -16,9 +16,9 @@ BEGIN
                   IF pIdFojaAnterior = -1 THEN
                     vAvance:=0;
                   ELSE                    
-                  --Asignmos el avance acumulado en vAvance.
-                  SELECT avaacuanterior + avaactual into vAvance FROM FOJADET
-                  WHERE idfoja = pIdFojaAnterior AND iditem =filaDetalles.iditem;
+                    --Asignmos el avance acumulado en vAvance.
+                    SELECT avaacuanterior + avaactual into vAvance FROM FOJADET
+                    WHERE idfoja = pIdFojaAnterior AND iditem =filaDetalles.iditem;
                   END IF;
                   --Insertamos el detalle con los siguientes valores:
                   --IdFoja, idItem, idObra, avanceAcumulado, NULL avance actual, NULL monto
@@ -26,6 +26,7 @@ BEGIN
                   VALUES (pIdFojaActual, filaDetalles.iditem, pIdObra, vAvance, NULL, NULL);
               end loop;
               close detallesFoja; --cerramos el cursor
-              END;              
+              END;
+   commit;
 END;
 /
