@@ -122,7 +122,7 @@ public class Login extends javax.swing.JFrame {
             // Si tiene el rol seleccionado...
             if(roles.next()) {
                 if(roles.getString(1).equalsIgnoreCase("Fojador")) {
-                    MenuFojador menuF = new MenuFojador(con);
+                    MenuFojador menuF = new MenuFojador(con, sqlStat);
                     menuF.setVisible(true);
                     this.dispose();
                 } else if(roles.getString(1).equalsIgnoreCase("Certificador")) {

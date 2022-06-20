@@ -1,10 +1,8 @@
 package Vistas;
 
-
 import java.sql.*;
 import java.util.*;
 import javax.swing.*;
-import javax.swing.event.*;
 import javax.swing.table.*;
 
 public class MenuFojador extends javax.swing.JFrame {
@@ -17,19 +15,22 @@ public class MenuFojador extends javax.swing.JFrame {
                                         " inner join guillermodb.empresa e on o.idempresa = e.idempresa" +
                                         " where guillermodb.fun_esfojeable(o.idobra) = 1" +
                                         " order by o.numobra";
-    private String queryFojasEditables = "select f.idfoja, o.idobra, o.nomobra, f.fecha from guillermodb.foja f " +
+    private String queryFojasEditables = "select f.idfoja, o.numobra, o.nomobra, f.fecha from guillermodb.foja f " +
                                          "inner join guillermodb.obra o on f.idobra = o.idobra " +
-                                         "where guillermodb.fun_estacertificada(f.idfoja) = 0";
+                                         "where guillermodb.fun_estacertificada(f.idfoja) = 0 order by f.idfoja";
     private Statement sqlStmn;
     private CallableStatement callSqlStmn;
     private ResultSet obrasFojeables;
     private ResultSet fojasEditables;
     private List<String> numObras = new ArrayList();
-    private String idFojaSelec;
+    
+    private int idFojaSelec;
+    private int numObraSelec;
+    
 
-    public MenuFojador(Connection con) throws SQLException {
+    public MenuFojador(Connection con, Statement stmn) {
         this.con = con;
-        this.sqlStmn = this.con.createStatement();
+        this.sqlStmn = stmn;
         initComponents();
         pnlCrearFoja.setVisible(false);
         pnlCargarFoja.setVisible(false);
@@ -46,16 +47,37 @@ public class MenuFojador extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        pnlCargarFoja = new javax.swing.JPanel();
-        lblTablaFojas = new javax.swing.JLabel();
-        btnCargarFoja = new javax.swing.JButton();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        tblFojas = new javax.swing.JTable();
         pnlCrearFoja = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblObras = new javax.swing.JTable();
         btnCrearFoja = new javax.swing.JButton();
         lblTabla = new javax.swing.JLabel();
+        pnlCargarFoja = new javax.swing.JPanel();
+        lblTablaFojas = new javax.swing.JLabel();
+        btnCargarFoja = new javax.swing.JButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        tblFojas = new javax.swing.JTable();
+        pnlConsultas = new javax.swing.JPanel();
+        pnlConsultaPorcentaje = new javax.swing.JPanel();
+        lblConsultaPorcentaje = new javax.swing.JLabel();
+        txtNumObra = new javax.swing.JTextField();
+        txtPorcAvance = new javax.swing.JTextField();
+        lblNumObra = new javax.swing.JLabel();
+        lblPorcAvance = new javax.swing.JLabel();
+        btnConsultaPorc = new javax.swing.JButton();
+        pnlConsultaMontos = new javax.swing.JPanel();
+        lblConsultaMontos = new javax.swing.JLabel();
+        txtNumObraM = new javax.swing.JTextField();
+        lblNumObraM = new javax.swing.JLabel();
+        lblFechaConsultaM = new javax.swing.JLabel();
+        txtFechaConsultaM = new javax.swing.JTextField();
+        lblDiferenciaM = new javax.swing.JLabel();
+        txtMontoBasicoM = new javax.swing.JTextField();
+        txtDiferenciaM = new javax.swing.JTextField();
+        lblMontoBasicoM = new javax.swing.JLabel();
+        lblMontoRedetM = new javax.swing.JLabel();
+        txtMontoRedetM = new javax.swing.JTextField();
+        btnConsultarM = new javax.swing.JButton();
         barraMenu = new javax.swing.JMenuBar();
         menuSesion = new javax.swing.JMenu();
         itemCerrarSesion = new javax.swing.JMenuItem();
@@ -63,69 +85,11 @@ public class MenuFojador extends javax.swing.JFrame {
         itemCrearFoja = new javax.swing.JMenuItem();
         itemCargarFoja = new javax.swing.JMenuItem();
         menuConsultas = new javax.swing.JMenu();
+        itemVerConsultas = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Menú de Fojador");
-
-        lblTablaFojas.setText("Lista de fojas editables (sin certificar)");
-
-        btnCargarFoja.setText("Cargar foja");
-        btnCargarFoja.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCargarFojaActionPerformed(evt);
-            }
-        });
-
-        tblFojas.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-
-            },
-            new String [] {
-                "Numero de foja", "Numero de obra", "Nombre de obra", "Fecha de la foja"
-            }
-        ) {
-            boolean[] canEdit = new boolean [] {
-                false, false, false, false
-            };
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        });
-        tblFojas.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        tblFojas.getTableHeader().setReorderingAllowed(false);
-        tblFojas.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                tblFojasMouseClicked(evt);
-            }
-        });
-        jScrollPane2.setViewportView(tblFojas);
-
-        javax.swing.GroupLayout pnlCargarFojaLayout = new javax.swing.GroupLayout(pnlCargarFoja);
-        pnlCargarFoja.setLayout(pnlCargarFojaLayout);
-        pnlCargarFojaLayout.setHorizontalGroup(
-            pnlCargarFojaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlCargarFojaLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnlCargarFojaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(pnlCargarFojaLayout.createSequentialGroup()
-                        .addComponent(lblTablaFojas, javax.swing.GroupLayout.PREFERRED_SIZE, 255, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnCargarFoja))
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 717, Short.MAX_VALUE))
-                .addContainerGap())
-        );
-        pnlCargarFojaLayout.setVerticalGroup(
-            pnlCargarFojaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlCargarFojaLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnlCargarFojaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(btnCargarFoja, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(lblTablaFojas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 232, Short.MAX_VALUE)
-                .addContainerGap())
-        );
+        setResizable(false);
 
         tblObras.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -180,7 +144,7 @@ public class MenuFojador extends javax.swing.JFrame {
             .addGroup(pnlCrearFojaLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(pnlCrearFojaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 717, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 920, Short.MAX_VALUE)
                     .addGroup(pnlCrearFojaLayout.createSequentialGroup()
                         .addComponent(lblTabla)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -195,13 +159,258 @@ public class MenuFojador extends javax.swing.JFrame {
                     .addComponent(btnCrearFoja, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(lblTabla, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 232, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 337, Short.MAX_VALUE)
                 .addContainerGap())
+        );
+
+        lblTablaFojas.setText("Lista de fojas editables (sin certificar)");
+
+        btnCargarFoja.setText("Cargar foja");
+        btnCargarFoja.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCargarFojaActionPerformed(evt);
+            }
+        });
+
+        tblFojas.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Numero de foja", "Numero de obra", "Nombre de obra", "Fecha de la foja"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        tblFojas.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        tblFojas.getTableHeader().setReorderingAllowed(false);
+        tblFojas.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblFojasMouseClicked(evt);
+            }
+        });
+        jScrollPane2.setViewportView(tblFojas);
+        if (tblFojas.getColumnModel().getColumnCount() > 0) {
+            tblFojas.getColumnModel().getColumn(0).setResizable(false);
+            tblFojas.getColumnModel().getColumn(0).setPreferredWidth(100);
+            tblFojas.getColumnModel().getColumn(1).setResizable(false);
+            tblFojas.getColumnModel().getColumn(1).setPreferredWidth(100);
+            tblFojas.getColumnModel().getColumn(2).setResizable(false);
+            tblFojas.getColumnModel().getColumn(2).setPreferredWidth(388);
+            tblFojas.getColumnModel().getColumn(3).setPreferredWidth(150);
+        }
+
+        javax.swing.GroupLayout pnlCargarFojaLayout = new javax.swing.GroupLayout(pnlCargarFoja);
+        pnlCargarFoja.setLayout(pnlCargarFojaLayout);
+        pnlCargarFojaLayout.setHorizontalGroup(
+            pnlCargarFojaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlCargarFojaLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnlCargarFojaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane2)
+                    .addGroup(pnlCargarFojaLayout.createSequentialGroup()
+                        .addComponent(lblTablaFojas, javax.swing.GroupLayout.PREFERRED_SIZE, 255, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 577, Short.MAX_VALUE)
+                        .addComponent(btnCargarFoja)))
+                .addContainerGap())
+        );
+        pnlCargarFojaLayout.setVerticalGroup(
+            pnlCargarFojaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlCargarFojaLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnlCargarFojaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(btnCargarFoja, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblTablaFojas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 337, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        pnlConsultaPorcentaje.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+
+        lblConsultaPorcentaje.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblConsultaPorcentaje.setText("Consultar avance de obra");
+        lblConsultaPorcentaje.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
+        lblConsultaPorcentaje.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+
+        txtPorcAvance.setEditable(false);
+
+        lblNumObra.setText("Número de obra:");
+
+        lblPorcAvance.setText("% de avance de obra:");
+
+        btnConsultaPorc.setText("Consultar");
+        btnConsultaPorc.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnConsultaPorcActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout pnlConsultaPorcentajeLayout = new javax.swing.GroupLayout(pnlConsultaPorcentaje);
+        pnlConsultaPorcentaje.setLayout(pnlConsultaPorcentajeLayout);
+        pnlConsultaPorcentajeLayout.setHorizontalGroup(
+            pnlConsultaPorcentajeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlConsultaPorcentajeLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnlConsultaPorcentajeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(btnConsultaPorc, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblConsultaPorcentaje, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, pnlConsultaPorcentajeLayout.createSequentialGroup()
+                        .addGroup(pnlConsultaPorcentajeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(lblPorcAvance, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(lblNumObra, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(pnlConsultaPorcentajeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtNumObra, javax.swing.GroupLayout.DEFAULT_SIZE, 138, Short.MAX_VALUE)
+                            .addComponent(txtPorcAvance))))
+                .addContainerGap())
+        );
+        pnlConsultaPorcentajeLayout.setVerticalGroup(
+            pnlConsultaPorcentajeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlConsultaPorcentajeLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(lblConsultaPorcentaje, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pnlConsultaPorcentajeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(txtNumObra, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblNumObra, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pnlConsultaPorcentajeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblPorcAvance, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtPorcAvance))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnConsultaPorc)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        pnlConsultaMontos.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+
+        lblConsultaMontos.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblConsultaMontos.setText("Consultar monto básico y redeterminado");
+        lblConsultaMontos.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
+        lblConsultaMontos.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+
+        lblNumObraM.setText("Número de obra:");
+
+        lblFechaConsultaM.setText("Fecha a consultar (aaaa-mm-dd):");
+
+        lblDiferenciaM.setText("Diferencia entre ambos:");
+
+        txtMontoBasicoM.setEditable(false);
+
+        txtDiferenciaM.setEditable(false);
+
+        lblMontoBasicoM.setText("Monto de contrato básico:");
+
+        lblMontoRedetM.setText("Monto de contrato redeterminado:");
+
+        txtMontoRedetM.setEditable(false);
+
+        btnConsultarM.setText("Consultar");
+        btnConsultarM.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnConsultarMActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout pnlConsultaMontosLayout = new javax.swing.GroupLayout(pnlConsultaMontos);
+        pnlConsultaMontos.setLayout(pnlConsultaMontosLayout);
+        pnlConsultaMontosLayout.setHorizontalGroup(
+            pnlConsultaMontosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlConsultaMontosLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnlConsultaMontosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnConsultarM, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblConsultaMontos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(pnlConsultaMontosLayout.createSequentialGroup()
+                        .addGroup(pnlConsultaMontosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(pnlConsultaMontosLayout.createSequentialGroup()
+                                .addComponent(lblFechaConsultaM, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
+                            .addGroup(pnlConsultaMontosLayout.createSequentialGroup()
+                                .addComponent(lblNumObraM, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGap(72, 72, 72))
+                            .addGroup(pnlConsultaMontosLayout.createSequentialGroup()
+                                .addComponent(lblMontoBasicoM, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
+                            .addGroup(pnlConsultaMontosLayout.createSequentialGroup()
+                                .addGroup(pnlConsultaMontosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(lblMontoRedetM)
+                                    .addComponent(lblDiferenciaM, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addGroup(pnlConsultaMontosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtDiferenciaM)
+                            .addComponent(txtMontoRedetM)
+                            .addComponent(txtMontoBasicoM)
+                            .addComponent(txtNumObraM)
+                            .addComponent(txtFechaConsultaM, javax.swing.GroupLayout.DEFAULT_SIZE, 237, Short.MAX_VALUE))))
+                .addContainerGap())
+        );
+        pnlConsultaMontosLayout.setVerticalGroup(
+            pnlConsultaMontosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlConsultaMontosLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(lblConsultaMontos, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pnlConsultaMontosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(txtNumObraM, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblNumObraM, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pnlConsultaMontosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblFechaConsultaM, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtFechaConsultaM, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pnlConsultaMontosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtMontoBasicoM)
+                    .addComponent(lblMontoBasicoM, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pnlConsultaMontosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblMontoRedetM, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtMontoRedetM, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(pnlConsultaMontosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblDiferenciaM, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtDiferenciaM))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnConsultarM)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout pnlConsultasLayout = new javax.swing.GroupLayout(pnlConsultas);
+        pnlConsultas.setLayout(pnlConsultasLayout);
+        pnlConsultasLayout.setHorizontalGroup(
+            pnlConsultasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlConsultasLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(pnlConsultaPorcentaje, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 199, Short.MAX_VALUE)
+                .addComponent(pnlConsultaMontos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+        pnlConsultasLayout.setVerticalGroup(
+            pnlConsultasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlConsultasLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnlConsultasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(pnlConsultaMontos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(pnlConsultaPorcentaje, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(151, Short.MAX_VALUE))
         );
 
         menuSesion.setText("Sesión");
 
         itemCerrarSesion.setText("Cerrar sesión");
+        itemCerrarSesion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                itemCerrarSesionActionPerformed(evt);
+            }
+        });
         menuSesion.add(itemCerrarSesion);
 
         barraMenu.add(menuSesion);
@@ -227,6 +436,15 @@ public class MenuFojador extends javax.swing.JFrame {
         barraMenu.add(menuFojas);
 
         menuConsultas.setText("Consultas");
+
+        itemVerConsultas.setText("Ver consultas");
+        itemVerConsultas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                itemVerConsultasActionPerformed(evt);
+            }
+        });
+        menuConsultas.add(itemVerConsultas);
+
         barraMenu.add(menuConsultas);
 
         setJMenuBar(barraMenu);
@@ -238,21 +456,23 @@ public class MenuFojador extends javax.swing.JFrame {
             .addComponent(pnlCrearFoja, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addComponent(pnlCargarFoja, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addComponent(pnlConsultas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(pnlCrearFoja, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addComponent(pnlCargarFoja, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addComponent(pnlConsultas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void itemCrearFojaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemCrearFojaActionPerformed
-        pnlCargarFoja.setVisible(false);
-        pnlCrearFoja.setVisible(true);
-        btnCrearFoja.setEnabled(false);
+        this.verPanelCrearFoja();
         try {
             cargarTablaObras();
         } catch (SQLException e) {
@@ -261,9 +481,7 @@ public class MenuFojador extends javax.swing.JFrame {
     }//GEN-LAST:event_itemCrearFojaActionPerformed
 
     private void itemCargarFojaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemCargarFojaActionPerformed
-        pnlCrearFoja.setVisible(false);
-        pnlCargarFoja.setVisible(true);
-        btnCargarFoja.setEnabled(false);
+        this.verPanelCargarFoja();
         try {
             cargarTablaFojas();
         } catch (SQLException e) {
@@ -276,16 +494,20 @@ public class MenuFojador extends javax.swing.JFrame {
             System.out.println(s);
         }
         try {
-            callSqlStmn = con.prepareCall("{CALL GuillermoDB.PRC_CREARFOJA(?, ?)}");
+            callSqlStmn = con.prepareCall("{CALL GuillermoDB.PRC_CREARFOJA(?, ?, ?)}");
             callSqlStmn.registerOutParameter(2, Types.INTEGER);
-            int vError;
+            callSqlStmn.registerOutParameter(3, Types.INTEGER);
+            int vError, vIdObra, vIdFoja;
             for(String numObra: numObras) {
                 callSqlStmn.setInt(1, Integer.valueOf(numObra));
                 callSqlStmn.execute();
                 vError = callSqlStmn.getInt(2);
+                vIdFoja = callSqlStmn.getInt(3);
                 switch(vError) {
                     case 0:
                         System.out.println("Foja de obra " + numObra + ": Todo bien");
+                        VerFoja vFoja = new VerFoja(this.con, this.sqlStmn, Integer.valueOf(numObra), vIdFoja);
+                        vFoja.setVisible(true);
                         break;
                     case 1:
                         System.out.println("Foja de obra " + numObra + ": no existe obra con ese numobra");
@@ -327,15 +549,91 @@ public class MenuFojador extends javax.swing.JFrame {
     private void tblFojasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblFojasMouseClicked
         if(this.tblListFojasModel.getSelectedItemsCount() == 1) {
             btnCargarFoja.setEnabled(true);
-            idFojaSelec = String.valueOf(tblFojas.getValueAt(tblFojas.getSelectedRow(), 0));
+            idFojaSelec = Integer.parseInt((String) tblFojas.getValueAt(tblFojas.getSelectedRow(), 0));
+            numObraSelec = Integer.parseInt((String) tblFojas.getValueAt(tblFojas.getSelectedRow(), 1));
         } else {
             btnCargarFoja.setEnabled(false);
         }
     }//GEN-LAST:event_tblFojasMouseClicked
 
     private void btnCargarFojaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCargarFojaActionPerformed
-        
+        CargarFoja vCargarFoja = new CargarFoja(this.con, this.sqlStmn, this.numObraSelec, this.idFojaSelec);
+        vCargarFoja.setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_btnCargarFojaActionPerformed
+
+    private void itemCerrarSesionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemCerrarSesionActionPerformed
+        if(JOptionPane.showConfirmDialog(this, "¿Seguro que desea cerrar sesión?", "Cerrar sesión",
+                                         JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+            try {
+                if(this.sqlStmn != null) {
+                    this.sqlStmn.close();
+                }
+                if(this.callSqlStmn != null) {
+                    this.callSqlStmn.close();
+                }
+                if(this.con != null) {
+                    this.con.close();
+                }
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(this, e.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
+            }
+            Login vLogin = new Login();
+            vLogin.setVisible(true);
+            this.dispose();
+        } else {
+            
+        }
+        
+    }//GEN-LAST:event_itemCerrarSesionActionPerformed
+
+    private void btnConsultaPorcActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConsultaPorcActionPerformed
+        try {
+            this.callSqlStmn = con.prepareCall("{? = call GuillermoDB.FUN_GETAVANCEOBRA(?)}");
+            this.callSqlStmn.registerOutParameter(1, Types.DOUBLE);
+            this.callSqlStmn.setInt(2, Integer.parseInt(txtNumObra.getText()));
+            this.callSqlStmn.execute();
+            this.txtPorcAvance.setText(String.valueOf(this.callSqlStmn.getDouble(1)));
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_btnConsultaPorcActionPerformed
+
+    private void btnConsultarMActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConsultarMActionPerformed
+        try {
+            this.callSqlStmn = con.prepareCall("{CALL GuillermoDB.PRC_DIFMONTO(?, ?, ?, ?, ?)}");
+            this.callSqlStmn.registerOutParameter(3, Types.INTEGER);
+            this.callSqlStmn.registerOutParameter(4, Types.DOUBLE);
+            this.callSqlStmn.registerOutParameter(5, Types.DOUBLE);
+            this.callSqlStmn.setInt(1, Integer.parseInt(txtNumObraM.getText()));
+            this.callSqlStmn.setDate(2, java.sql.Date.valueOf(txtFechaConsultaM.getText()));
+            this.callSqlStmn.execute();
+            switch(this.callSqlStmn.getInt(3)) {
+                case 0:
+                    txtMontoBasicoM.setText(String.valueOf(this.callSqlStmn.getDouble(4)));
+                    txtMontoRedetM.setText(String.valueOf(this.callSqlStmn.getDouble(5)));
+                    txtDiferenciaM.setText(String.valueOf(this.callSqlStmn.getDouble(5) - this.callSqlStmn.getDouble(4)));
+                    break;
+                case 1:
+                    JOptionPane.showMessageDialog(this, "No existe una obra con ese número de obra.", "ERROR", JOptionPane.ERROR_MESSAGE);
+                    break;
+                case 2:
+                    txtMontoBasicoM.setText(String.valueOf(this.callSqlStmn.getDouble(4)));
+                    txtMontoRedetM.setText("");
+                    txtDiferenciaM.setText("");
+                    JOptionPane.showMessageDialog(this, "La obra no tiene una redeterminación activa en esa fecha.", "ERROR", JOptionPane.WARNING_MESSAGE);
+                    break;
+                default:
+                    break;
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_btnConsultarMActionPerformed
+
+    private void itemVerConsultasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemVerConsultasActionPerformed
+        this.verPanelConsultas();
+    }//GEN-LAST:event_itemVerConsultasActionPerformed
 
     private ResultSet getObrasFojeables() {
         ResultSet obrasFojeables = null;
@@ -398,23 +696,63 @@ public class MenuFojador extends javax.swing.JFrame {
         this.btnCargarFoja.setEnabled(false);
     }
     
+    private void verPanelCrearFoja() {
+        this.pnlCrearFoja.setVisible(true);
+        this.pnlCargarFoja.setVisible(false);
+        this.pnlConsultas.setVisible(false);
+    }
+    
+    private void verPanelCargarFoja() {
+        this.pnlCrearFoja.setVisible(false);
+        this.pnlCargarFoja.setVisible(true);
+        this.pnlConsultas.setVisible(false);
+    }
+    
+    private void verPanelConsultas() {
+        this.pnlCrearFoja.setVisible(false);
+        this.pnlCargarFoja.setVisible(false);
+        this.pnlConsultas.setVisible(true);
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuBar barraMenu;
     private javax.swing.JButton btnCargarFoja;
+    private javax.swing.JButton btnConsultaPorc;
+    private javax.swing.JButton btnConsultarM;
     private javax.swing.JButton btnCrearFoja;
     private javax.swing.JMenuItem itemCargarFoja;
     private javax.swing.JMenuItem itemCerrarSesion;
     private javax.swing.JMenuItem itemCrearFoja;
+    private javax.swing.JMenuItem itemVerConsultas;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JLabel lblConsultaMontos;
+    private javax.swing.JLabel lblConsultaPorcentaje;
+    private javax.swing.JLabel lblDiferenciaM;
+    private javax.swing.JLabel lblFechaConsultaM;
+    private javax.swing.JLabel lblMontoBasicoM;
+    private javax.swing.JLabel lblMontoRedetM;
+    private javax.swing.JLabel lblNumObra;
+    private javax.swing.JLabel lblNumObraM;
+    private javax.swing.JLabel lblPorcAvance;
     private javax.swing.JLabel lblTabla;
     private javax.swing.JLabel lblTablaFojas;
     private javax.swing.JMenu menuConsultas;
     private javax.swing.JMenu menuFojas;
     private javax.swing.JMenu menuSesion;
     private javax.swing.JPanel pnlCargarFoja;
+    private javax.swing.JPanel pnlConsultaMontos;
+    private javax.swing.JPanel pnlConsultaPorcentaje;
+    private javax.swing.JPanel pnlConsultas;
     private javax.swing.JPanel pnlCrearFoja;
     private javax.swing.JTable tblFojas;
     private javax.swing.JTable tblObras;
+    private javax.swing.JTextField txtDiferenciaM;
+    private javax.swing.JTextField txtFechaConsultaM;
+    private javax.swing.JTextField txtMontoBasicoM;
+    private javax.swing.JTextField txtMontoRedetM;
+    private javax.swing.JTextField txtNumObra;
+    private javax.swing.JTextField txtNumObraM;
+    private javax.swing.JTextField txtPorcAvance;
     // End of variables declaration//GEN-END:variables
 }
