@@ -1,6 +1,8 @@
 package Vistas;
 
+
 import java.sql.*;
+import java.util.*;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
@@ -8,29 +10,31 @@ import javax.swing.table.*;
 public class MenuFojador extends javax.swing.JFrame {
     
     private ListSelectionModel tblListObrasModel;
+    private ListSelectionModel tblListFojasModel;
     private Connection con;
     private String queryObrasFojeables = "select o.numobra, o.nomobra, l.nomloc, e.razonsocial, o.fecinicio from guillermodb.obra o" +
                                         " inner join guillermodb.localidad l on o.idlocalidad = l.idlocalidad" +
                                         " inner join guillermodb.empresa e on o.idempresa = e.idempresa" +
                                         " where guillermodb.fun_esfojeable(o.idobra) = 1" +
                                         " order by o.numobra";
+    private String queryFojasEditables = "select f.idfoja, o.idobra, o.nomobra, f.fecha from guillermodb.foja f " +
+                                         "inner join guillermodb.obra o on f.idobra = o.idobra " +
+                                         "where guillermodb.fun_estacertificada(f.idfoja) = 0";
     private Statement sqlStmn;
+    private CallableStatement callSqlStmn;
     private ResultSet obrasFojeables;
+    private ResultSet fojasEditables;
+    private List<String> numObras = new ArrayList();
+    private String idFojaSelec;
 
     public MenuFojador(Connection con) throws SQLException {
         this.con = con;
         this.sqlStmn = this.con.createStatement();
         initComponents();
         pnlCrearFoja.setVisible(false);
+        pnlCargarFoja.setVisible(false);
         tblListObrasModel = tblObras.getSelectionModel();
-        tblListObrasModel.addListSelectionListener(new ListSelectionListener () {
-            @Override
-            public void valueChanged(ListSelectionEvent evt) {
-                tblObrasValueChanged(evt);
-            }
-            
-        });
-        
+        tblListFojasModel = tblFojas.getSelectionModel();
     }
 
     /**
@@ -42,6 +46,11 @@ public class MenuFojador extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        pnlCargarFoja = new javax.swing.JPanel();
+        lblTablaFojas = new javax.swing.JLabel();
+        btnCargarFoja = new javax.swing.JButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        tblFojas = new javax.swing.JTable();
         pnlCrearFoja = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblObras = new javax.swing.JTable();
@@ -57,6 +66,66 @@ public class MenuFojador extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Menú de Fojador");
+
+        lblTablaFojas.setText("Lista de fojas editables (sin certificar)");
+
+        btnCargarFoja.setText("Cargar foja");
+        btnCargarFoja.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCargarFojaActionPerformed(evt);
+            }
+        });
+
+        tblFojas.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "Numero de foja", "Numero de obra", "Nombre de obra", "Fecha de la foja"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        tblFojas.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        tblFojas.getTableHeader().setReorderingAllowed(false);
+        tblFojas.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblFojasMouseClicked(evt);
+            }
+        });
+        jScrollPane2.setViewportView(tblFojas);
+
+        javax.swing.GroupLayout pnlCargarFojaLayout = new javax.swing.GroupLayout(pnlCargarFoja);
+        pnlCargarFoja.setLayout(pnlCargarFojaLayout);
+        pnlCargarFojaLayout.setHorizontalGroup(
+            pnlCargarFojaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlCargarFojaLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnlCargarFojaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlCargarFojaLayout.createSequentialGroup()
+                        .addComponent(lblTablaFojas, javax.swing.GroupLayout.PREFERRED_SIZE, 255, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(btnCargarFoja))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 717, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        pnlCargarFojaLayout.setVerticalGroup(
+            pnlCargarFojaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlCargarFojaLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnlCargarFojaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(btnCargarFoja, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblTablaFojas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 232, Short.MAX_VALUE)
+                .addContainerGap())
+        );
 
         tblObras.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -74,7 +143,13 @@ public class MenuFojador extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
+        tblObras.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         tblObras.getTableHeader().setReorderingAllowed(false);
+        tblObras.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblObrasMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tblObras);
         if (tblObras.getColumnModel().getColumnCount() > 0) {
             tblObras.getColumnModel().getColumn(0).setResizable(false);
@@ -120,7 +195,7 @@ public class MenuFojador extends javax.swing.JFrame {
                     .addComponent(btnCrearFoja, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(lblTabla, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 222, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 232, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -161,16 +236,21 @@ public class MenuFojador extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(pnlCrearFoja, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addComponent(pnlCargarFoja, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(pnlCrearFoja, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addComponent(pnlCargarFoja, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void itemCrearFojaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemCrearFojaActionPerformed
+        pnlCargarFoja.setVisible(false);
         pnlCrearFoja.setVisible(true);
         btnCrearFoja.setEnabled(false);
         try {
@@ -182,11 +262,80 @@ public class MenuFojador extends javax.swing.JFrame {
 
     private void itemCargarFojaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemCargarFojaActionPerformed
         pnlCrearFoja.setVisible(false);
+        pnlCargarFoja.setVisible(true);
+        btnCargarFoja.setEnabled(false);
+        try {
+            cargarTablaFojas();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_itemCargarFojaActionPerformed
 
     private void btnCrearFojaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCrearFojaActionPerformed
-        // TODO add your handling code here:
+        for(String s: numObras) {
+            System.out.println(s);
+        }
+        try {
+            callSqlStmn = con.prepareCall("{CALL GuillermoDB.PRC_CREARFOJA(?, ?)}");
+            callSqlStmn.registerOutParameter(2, Types.INTEGER);
+            int vError;
+            for(String numObra: numObras) {
+                callSqlStmn.setInt(1, Integer.valueOf(numObra));
+                callSqlStmn.execute();
+                vError = callSqlStmn.getInt(2);
+                switch(vError) {
+                    case 0:
+                        System.out.println("Foja de obra " + numObra + ": Todo bien");
+                        break;
+                    case 1:
+                        System.out.println("Foja de obra " + numObra + ": no existe obra con ese numobra");
+                        break;
+                    case 2:
+                        System.out.println("Foja de obra " + numObra + ": última foja certificada, pero el certificado sigue abierto");
+                        break;
+                    case 3:
+                        System.out.println("Foja de obra " + numObra + ": última foja sin certificar");
+                        break;
+                    default:
+                        break;
+                }
+            }
+            cargarTablaObras();
+        } catch(SQLException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
+        
     }//GEN-LAST:event_btnCrearFojaActionPerformed
+
+    private void tblObrasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblObrasMouseClicked
+        if(this.tblListObrasModel.getSelectedItemsCount() > 0) {
+            btnCrearFoja.setEnabled(true);
+            this.numObras.clear();
+            int[] index = tblObras.getSelectedRows();
+            for(int i = 0; i < tblObras.getSelectedRowCount(); i++) {
+                String numObra = String.valueOf(tblObras.getValueAt(index[i], 0));
+                if(!this.numObras.contains(numObra)) {
+                    this.numObras.add(numObra);
+                }
+            }
+        } else {
+            btnCrearFoja.setEnabled(false);
+        }
+        
+    }//GEN-LAST:event_tblObrasMouseClicked
+
+    private void tblFojasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblFojasMouseClicked
+        if(this.tblListFojasModel.getSelectedItemsCount() == 1) {
+            btnCargarFoja.setEnabled(true);
+            idFojaSelec = String.valueOf(tblFojas.getValueAt(tblFojas.getSelectedRow(), 0));
+        } else {
+            btnCargarFoja.setEnabled(false);
+        }
+    }//GEN-LAST:event_tblFojasMouseClicked
+
+    private void btnCargarFojaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCargarFojaActionPerformed
+        
+    }//GEN-LAST:event_btnCargarFojaActionPerformed
 
     private ResultSet getObrasFojeables() {
         ResultSet obrasFojeables = null;
@@ -196,6 +345,16 @@ public class MenuFojador extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, e.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
         }
         return obrasFojeables;
+    }
+    
+    private ResultSet getFojasEditables() {
+        ResultSet fojasEditables = null;
+        try {
+            fojasEditables = sqlStmn.executeQuery(queryFojasEditables);
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
+        return fojasEditables;
     }
     
     private void cargarTablaObras() throws SQLException {
@@ -214,10 +373,19 @@ public class MenuFojador extends javax.swing.JFrame {
         deselectFilasTblObras();
     }
     
-    private void tblObrasValueChanged(ListSelectionEvent evt) {
-        if(this.tblListObrasModel.getSelectedItemsCount() > 0) {
-            this.btnCrearFoja.setEnabled(true);
+    private void cargarTablaFojas() throws SQLException {
+        this.fojasEditables = this.getFojasEditables();
+        DefaultTableModel tblFojasModel = (DefaultTableModel) tblFojas.getModel();
+        tblFojasModel.setRowCount(0);
+        while(fojasEditables.next()){
+            String idFoja = String.valueOf(fojasEditables.getInt(1));
+            String nroObra = String.valueOf(fojasEditables.getInt(2));
+            String nomObra = fojasEditables.getString(3);
+            String fechaFoja = fojasEditables.getDate(4).toString();
+            String[] tblData = {idFoja, nroObra, nomObra, fechaFoja};
+            tblFojasModel.addRow(tblData);
         }
+        deselectFilasTblFojas();
     }
     
     private void deselectFilasTblObras() {
@@ -225,18 +393,28 @@ public class MenuFojador extends javax.swing.JFrame {
         this.btnCrearFoja.setEnabled(false);
     }
     
+    private void deselectFilasTblFojas() {
+        this.tblListFojasModel.clearSelection();
+        this.btnCargarFoja.setEnabled(false);
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuBar barraMenu;
+    private javax.swing.JButton btnCargarFoja;
     private javax.swing.JButton btnCrearFoja;
     private javax.swing.JMenuItem itemCargarFoja;
     private javax.swing.JMenuItem itemCerrarSesion;
     private javax.swing.JMenuItem itemCrearFoja;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JLabel lblTabla;
+    private javax.swing.JLabel lblTablaFojas;
     private javax.swing.JMenu menuConsultas;
     private javax.swing.JMenu menuFojas;
     private javax.swing.JMenu menuSesion;
+    private javax.swing.JPanel pnlCargarFoja;
     private javax.swing.JPanel pnlCrearFoja;
+    private javax.swing.JTable tblFojas;
     private javax.swing.JTable tblObras;
     // End of variables declaration//GEN-END:variables
 }
