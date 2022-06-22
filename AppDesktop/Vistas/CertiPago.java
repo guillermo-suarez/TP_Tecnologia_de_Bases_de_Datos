@@ -317,8 +317,8 @@ public class CertiPago extends javax.swing.JFrame {
             proc.registerOutParameter(4, Types.DOUBLE); //se setea tipo de dato de vMontoBase
             proc.registerOutParameter(5, Types.DOUBLE); //se setea tipo de dato de vMontoRedet
             proc.execute();
-            this.lblMontoBase.setText(String.valueOf(proc.getDouble(4)));//Se coloca en el label el valor base
-            this.lblMontoActual.setText(String.valueOf(proc.getDouble(5)));//Se coloca en el label el valor actual
+            this.lblMontoBase.setText(String.format("%.2f", proc.getDouble(4)));//Se coloca en el label el valor base
+            this.lblMontoActual.setText(String.format("%.2f", proc.getDouble(5)));//Se coloca en el label el valor actual
             proc.close();
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
@@ -349,7 +349,7 @@ public class CertiPago extends javax.swing.JFrame {
                 totInfra = columnaInfra;
                 columnaTot = columna2 + columna3;
                 totTot = columnaTot;
-                String[] tblData = {columna1, "$"+columnaViv.toString(), "$"+columnaInfra.toString(), "$"+columnaTot.toString()};
+                String[] tblData = {columna1, String.format("$ %.2f", columnaViv), String.format("$ %.2f", columnaInfra), String.format("$ %.2f", columnaTot)};
                 tblCPMesModel.addRow(tblData);
             }else{//se agregan las demas filas que sean porcentajes
                 columna1 = conceptos.getString(2);
@@ -359,13 +359,13 @@ public class CertiPago extends javax.swing.JFrame {
                 totInfra += columna3;
                 columna4 = columna2 + columna3;
                 totTot += columna4;
-                String[] tblData = {columna1, "$"+columna2.toString(), "$"+columna3.toString(), "$"+columna4.toString()};
+                String[] tblData = {columna1, String.format("$ %.2f", columna2), String.format("$ %.2f", columna3), String.format("$ %.2f", columna4)};
                 tblCPMesModel.addRow(tblData);
             }
         }
         //Se agrega la fila de totales
         columna1 = "Total";
-        String[] tblData = {columna1, "$" + totViv.toString(), "$" + totInfra.toString(), "$" + totTot.toString()};
+        String[] tblData = {columna1, String.format("$ %.2f", totViv),String.format("$ %.2f", totInfra), String.format("$ %.2f", totTot)};
         tblCPMesModel.addRow(tblData);    
     }
     
@@ -421,12 +421,12 @@ public class CertiPago extends javax.swing.JFrame {
             totMes += columMes;
             columAcum = columAnt + columMes;
             total += columAcum;
-            String[] tblData = {columCon, "$" + columAnt.toString(), "$" + columMes.toString(), "$" + columAcum.toString()};
+            String[] tblData = {columCon, String.format("$ %.2f", columAnt), String.format("$ %.2f", columMes), String.format("$ %.2f", columAcum)};
             tblCPMesModel.addRow(tblData);
         }
         //Se agrega la fila de totales
         columCon = "Total";
-        String[] tblData = {columCon, "$" + totAnt.toString(), "$" + totMes.toString(), "$" + total.toString()};
+        String[] tblData = {columCon, String.format("$ %.2f", totAnt), String.format("$ %.2f", totMes), String.format("$ %.2f", total)};
         tblCPMesModel.addRow(tblData);    
     }
     
