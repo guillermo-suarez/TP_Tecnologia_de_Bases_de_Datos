@@ -5,27 +5,30 @@
 package Vistas;
 
 import java.sql.*;
-import java.time.LocalDate;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import App.Numero_Letras;
 
 public class CertiPago extends javax.swing.JFrame {
     
     private Connection con;
     private Statement sqlStmn;
-    private ResultSet datosMes;
-    private ResultSet datosAcum;
+    //private ResultSet datosMes;
+    //private ResultSet datosAcum;
     private ResultSet datosObra;
+    private ResultSet conceptos;
     private ListSelectionModel tblListCertiMesModel;
     private ListSelectionModel tblListCertiAcumModel;
     private String SQL;
     private Integer IdObra;
+    private Double totTot;
     private Date fechaCerti;
+    private Numero_Letras nl;
 
     public CertiPago(Connection con, Statement sqlStmn, Integer NumObra, Integer NroCerti) {
         initComponents();
+        totTot = 0.0;
+        nl = new Numero_Letras();
         this.con = con;
         this.sqlStmn = sqlStmn;
         tblListCertiMesModel = tblMes.getSelectionModel();
@@ -36,7 +39,9 @@ public class CertiPago extends javax.swing.JFrame {
         try{
             cargarDatosObra(NumObra, NroCerti);
             cargarMontos(NumObra);
-            cargarCertiPago(NroCerti);
+            cargarTablaMes(NroCerti);
+            this.lblAPagar.setText(nl.Convertir(String.format("%.2f", totTot), true, "CENTAVOS"));//se convierte el monto total a palabras
+            cargarTablaAcum(NroCerti);
         }
         catch (SQLException e){
             JOptionPane.showMessageDialog(this, e.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
@@ -220,13 +225,13 @@ public class CertiPago extends javax.swing.JFrame {
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel9)
-                            .addComponent(jLabel10)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel11)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(lblAPagar)))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 524, Short.MAX_VALUE))
+                            .addComponent(jLabel10))
+                        .addGap(0, 465, Short.MAX_VALUE))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 524, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                        .addComponent(jLabel11)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(lblAPagar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -320,18 +325,60 @@ public class CertiPago extends javax.swing.JFrame {
         }
     }
     
-    private void cargarCertiPago(Integer NroCerti) throws SQLException{
-        this.datosMes = this.getDatosMes(NroCerti);
-        this.datosAcum = this.getDatosAcum(NroCerti);
+    private void cargarTablaMes(Integer NroCerti) throws SQLException{//Carga la tablas con los montos del mes
+        //fila de avance de obra
+        Double columnaViv = 0.0;
+        Double columnaInfra = 0.0;
+        Double columnaTot = 0.0;
+        //filas de porcentajes
+        String columna1 = new String();
+        Double columna2 = 0.0;
+        Double columna3 = 0.0;
+        Double columna4 = 0.0;
+        //fila de totales
+        Double totViv = 0.0;
+        Double totInfra = 0.0;
         DefaultTableModel tblCPMesModel = (DefaultTableModel) tblMes.getModel();
-        //acá sigue para cargar las tablas?
+        tblCPMesModel.setRowCount(0);
+        while(conceptos.next()){
+            if(conceptos.getInt(1)==0){//Ve si la fila es de avance de obra
+                columna1 = conceptos.getString(2);
+                columnaViv = getMontoIndividualMes(NroCerti, "{? = call FUN_GETMONTOVIVIENDATOTAL(?,?)}");
+                totViv = columnaViv;
+                columnaInfra = getMontoIndividualMes(NroCerti, "{? = call FUN_GETMONTOINFRATOTAL(?,?)}");
+                totInfra = columnaInfra;
+                columnaTot = columna2 + columna3;
+                totTot = columnaTot;
+                String[] tblData = {columna1, "$"+columnaViv.toString(), "$"+columnaInfra.toString(), "$"+columnaTot.toString()};
+                tblCPMesModel.addRow(tblData);
+            }else{//se agregan las demas filas que sean porcentajes
+                columna1 = conceptos.getString(2);
+                columna2 = (columnaViv * (conceptos.getDouble(3)/100))*(-1);//se lo vuelve negativo porque se debe descontar del total
+                totViv += columna2;
+                columna3 = (columnaInfra * (conceptos.getDouble(3)/100))*(-1);
+                totInfra += columna3;
+                columna4 = columna2 + columna3;
+                totTot += columna4;
+                String[] tblData = {columna1, "$"+columna2.toString(), "$"+columna3.toString(), "$"+columna4.toString()};
+                tblCPMesModel.addRow(tblData);
+            }
+        }
+        //Se agrega la fila de totales
+        columna1 = "Total";
+        String[] tblData = {columna1, "$" + totViv.toString(), "$" + totInfra.toString(), "$" + totTot.toString()};
+        tblCPMesModel.addRow(tblData);    
     }
     
     
-    private ResultSet getDatosMes(Integer NroCerti){
-        ResultSet resultado = null;
+    private Double getMontoIndividualMes(Integer NroCerti, String consulta){//Busca los montos totales de vivienda y de infra
+        Double resultado = null;
         try{
-            resultado = sqlStmn.executeQuery(SQL);
+            CallableStatement func = con.prepareCall(consulta);
+            func.setInt(1, this.IdObra);
+            func.setInt(2, NroCerti);
+            func.registerOutParameter(1, Types.DOUBLE);
+            func.execute();
+            resultado = func.getDouble(1);
         }
         catch (SQLException e){
             JOptionPane.showMessageDialog(this, e.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
@@ -339,8 +386,56 @@ public class CertiPago extends javax.swing.JFrame {
         return resultado;
     }
     
-    private ResultSet getDatosAcum(Integer NroCerti){
+    private ResultSet buscarConceptos(){//Busca los conceptos para armar la tabla de montos del mes
         ResultSet resultado = null;
+        SQL = "SELECT c.idconcepto, c.denconcepto, co.porcentaje\n" +
+              "FROM concepto c\n" +
+              "INNER JOIN conceptosxobra co ON c.idconcepto = co.idconcepto\n" +
+              "WHERE co.idobra = " + this.IdObra.toString();
+        try{
+            this.conceptos = this.sqlStmn.executeQuery(SQL);
+        }
+        catch (SQLException e){
+            JOptionPane.showMessageDialog(this, e.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
+        return resultado;
+    }
+    
+    private void cargarTablaAcum(Integer NroCerti) throws SQLException{//Carga la tablas con los montos del mes
+        ResultSet resultado;
+        String columCon = new String();
+        Double columAnt = 0.0;
+        Double columMes = 0.0;
+        Double columAcum = 0.0;
+        Double totAnt = 0.0;
+        Double totMes = 0.0;
+        Double total = 0.0;
+        DefaultTableModel tblCPMesModel = (DefaultTableModel) tblAcumulado.getModel();
+        tblCPMesModel.setRowCount(0);
+        resultado = getDatosAcum(NroCerti);
+        while(resultado.next()){
+            columCon = resultado.getString(1);
+            columAnt = resultado.getDouble(2);
+            totAnt += columAnt;
+            columMes = resultado.getDouble(3);
+            totMes += columMes;
+            columAcum = columAnt + columMes;
+            total += columAcum;
+            String[] tblData = {columCon, "$" + columAnt.toString(), "$" + columMes.toString(), "$" + columAcum.toString()};
+            tblCPMesModel.addRow(tblData);
+        }
+        //Se agrega la fila de totales
+        columCon = "Total";
+        String[] tblData = {columCon, "$" + totAnt.toString(), "$" + totMes.toString(), "$" + total.toString()};
+        tblCPMesModel.addRow(tblData);    
+    }
+    
+    private ResultSet getDatosAcum(Integer NroCerti){//Se busca unicamente los conceptos x certificado especificos de la obra y del certificado
+        ResultSet resultado = null;
+        SQL = "SELECT c.denconcepto, cc.importeacuant, cc.importe\n" +
+              "FROM conceptosxcertif cc\n" +
+              "INNER JOIN concepto c ON c.idconcepto = cc.idconcepto\n" +
+              "WHERE cc.idobra = " + this.IdObra + " AND cc.nrocertificado = " + NroCerti.toString();
         try{
             resultado = sqlStmn.executeQuery(SQL);  
         }
