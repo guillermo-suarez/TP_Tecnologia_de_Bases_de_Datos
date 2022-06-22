@@ -1,7 +1,7 @@
-CREATE OR REPLACE FUNCTION FUN_FOJAESTAVACIA (pIdFoja foja.idfoja%type)
-return boolean
+CREATE OR REPLACE NONEDITIONABLE FUNCTION FUN_FOJAESTAVACIA (pIdFoja foja.idfoja%type)
+return number
 is
-vEs boolean := false;
+vEs number := 0;
 vAvance fojadet.avaactual%type;
 begin
   --Declaramos un cursos para poder iterar los detalles. Itera id detalle foja
@@ -18,7 +18,7 @@ begin
             SELECT f.avaactual into vAvance FROM Fojadet F 
             WHERE f.idfoja=pIdFoja and f.iditem=filaDetalles.iditem;
             if vAvance is null then
-              vEs := true;
+              vEs := 1;
             end if;
         end loop;
       close detallesFoja; --cerramos el cursor
