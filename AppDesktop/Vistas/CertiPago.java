@@ -5,6 +5,9 @@
 package Vistas;
 
 import java.sql.*;
+import java.time.LocalDate;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
@@ -14,18 +17,26 @@ public class CertiPago extends javax.swing.JFrame {
     private Statement sqlStmn;
     private ResultSet datosMes;
     private ResultSet datosAcum;
+    private ResultSet datosObra;
     private ListSelectionModel tblListCertiMesModel;
     private ListSelectionModel tblListCertiAcumModel;
-    
+    private String SQL;
+    private Integer IdObra;
+    private Date fechaCerti;
 
-    public CertiPago(Connection con, Statement sqlStmn) {
+    public CertiPago(Connection con, Statement sqlStmn, Integer NumObra, Integer NroCerti) {
         initComponents();
         this.con = con;
         this.sqlStmn = sqlStmn;
         tblListCertiMesModel = tblMes.getSelectionModel();
         tblListCertiAcumModel = tblAcumulado.getSelectionModel();
+        SQL = new String();
+        this.lblTitulo.setText("Certificado de Pago Nro: "+NroCerti.toString());//se establece el título
+        
         try{
-            cargarCertiPago();
+            cargarDatosObra(NumObra, NroCerti);
+            cargarMontos(NumObra);
+            cargarCertiPago(NroCerti);
         }
         catch (SQLException e){
             JOptionPane.showMessageDialog(this, e.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
@@ -66,9 +77,8 @@ public class CertiPago extends javax.swing.JFrame {
         tblMes = new javax.swing.JTable();
         jLabel11 = new javax.swing.JLabel();
         lblAPagar = new javax.swing.JLabel();
-        btnCerrar = new javax.swing.JButton();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         lblTitulo.setText("Certificado de Pago Nro: X");
 
@@ -154,13 +164,6 @@ public class CertiPago extends javax.swing.JFrame {
 
         lblAPagar.setText("totalapagar");
 
-        btnCerrar.setText("Cerrar");
-        btnCerrar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnCerrarActionPerformed(evt);
-            }
-        });
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -213,7 +216,6 @@ public class CertiPago extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(btnCerrar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -268,31 +270,68 @@ public class CertiPago extends javax.swing.JFrame {
                 .addComponent(jLabel10)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 94, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 25, Short.MAX_VALUE)
-                .addComponent(btnCerrar)
-                .addGap(16, 16, 16))
+                .addContainerGap(42, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void btnCerrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCerrarActionPerformed
-        this.dispose();
-    }//GEN-LAST:event_btnCerrarActionPerformed
-
     
-    private void cargarCertiPago() throws SQLException{
-        this.datosMes = this.getDatosMes();
-        this.datosAcum = this.getDatosAcum();
+   
+    private void cargarDatosObra(Integer NumObra, Integer NroCerti){ //Procedimiento que carga los label con los datos de la obra
+        this.SQL = "SELECT o.idobra, l.nomloc, o.nomobra, o.plazo_mes, o.fecinicio, c.fechacert\n"
+                 + "FROM obra o\n"
+                 + "INNER JOIN localidad l ON o.idlocalidad = l.idlocalidad\n"
+                 + "INNER JOIN certipago c ON o.idobra = c.idobra\n"
+                 + "WHERE o.numobra =" + NumObra.toString()
+                 + "AND c.nrocertificado = " + NroCerti.toString();
+        try {
+            this.datosObra = this.sqlStmn.executeQuery(SQL);
+            if(this.datosObra.next()){
+                this.IdObra = this.datosObra.getInt(1); //Este dato se usa luego para calcular los montos
+                this.lblLocalidad.setText(this.datosObra.getString(2));
+                this.lblNombreObra.setText(this.datosObra.getString(3));
+                this.lblPlazo.setText(this.datosObra.getString(4));
+                this.lblFechaInicio.setText(this.datosObra.getString(5));
+                this.fechaCerti = this.datosObra.getDate(6);
+                this.lblFecha.setText(fechaCerti.toString());//se carga la fecha del certificado
+                this.SQL = null;//Se limpia el SQL por las dudas
+            }else{
+                JOptionPane.showMessageDialog(this, "Número de obra inexistente", "ERROR", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    private void cargarMontos(Integer NumObra){//Procedimiento que carga los label de los contratos
+        try {
+            CallableStatement proc = con.prepareCall("{CALL PRC_DIFMONTO(?,?,?,?,?)}");
+            proc.setInt(1, NumObra);//se setea tipo de dato de pNumObra
+            proc.setDate(2, this.fechaCerti);//se setea tipo de dato de pFechaBusq
+            proc.registerOutParameter(3, Types.INTEGER); //se setea tipo de dato de pError
+            proc.registerOutParameter(4, Types.DOUBLE); //se setea tipo de dato de vMontoBase
+            proc.registerOutParameter(5, Types.DOUBLE); //se setea tipo de dato de vMontoRedet
+            proc.execute();
+            this.lblMontoBase.setText(String.valueOf(proc.getDouble(4)));//Se coloca en el label el valor base
+            this.lblMontoActual.setText(String.valueOf(proc.getDouble(5)));//Se coloca en el label el valor actual
+            proc.close();
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    private void cargarCertiPago(Integer NroCerti) throws SQLException{
+        this.datosMes = this.getDatosMes(NroCerti);
+        this.datosAcum = this.getDatosAcum(NroCerti);
         DefaultTableModel tblCPMesModel = (DefaultTableModel) tblMes.getModel();
-        
+        //acá sigue para cargar las tablas?
     }
     
     
-    private ResultSet getDatosMes(){
+    private ResultSet getDatosMes(Integer NroCerti){
         ResultSet resultado = null;
         try{
-            resultado = sqlStmn.executeQuery("SQL");
+            resultado = sqlStmn.executeQuery(SQL);
         }
         catch (SQLException e){
             JOptionPane.showMessageDialog(this, e.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
@@ -300,10 +339,10 @@ public class CertiPago extends javax.swing.JFrame {
         return resultado;
     }
     
-    private ResultSet getDatosAcum(){
+    private ResultSet getDatosAcum(Integer NroCerti){
         ResultSet resultado = null;
         try{
-            resultado = sqlStmn.executeQuery("SQL");  
+            resultado = sqlStmn.executeQuery(SQL);  
         }
         catch (SQLException e){
             JOptionPane.showMessageDialog(this, e.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
@@ -315,7 +354,6 @@ public class CertiPago extends javax.swing.JFrame {
     
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnCerrar;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
