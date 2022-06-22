@@ -1,4 +1,4 @@
-CREATE OR REPLACE PROCEDURE PRC_CrearConceptosXCertif (pIdObra obra.idobra%type,
+CREATE OR REPLACE NONEDITIONABLE PROCEDURE PRC_CrearConceptosXCertif (pIdObra obra.idobra%type,
                                                        pFoja foja.idfoja%type,
                                                        pIdCerti certipago.nrocertificado%type)
 IS
@@ -6,6 +6,7 @@ IS
   vAcum conceptosxcertif.importeacuant%type;
   vHayCerti number;
   vPorcentaje conceptosxobra.porcentaje%type;
+  vConteo number;
 BEGIN
   --Sacamos el importe
   SELECT SUM(fd.monto) into vImporte FROM FOJADET fd WHERE fd.idfoja = pFoja;
@@ -39,8 +40,19 @@ BEGIN
               loop
                 fetch conceptosCerti into filaConceptos;
                 exit when conceptosCerti%notfound;
-                     SELECT cc.importeacuant into vAcum FROM conceptosxcertif cc WHERE cc.idconcepto = filaConceptos.idconcepto;
-                     if (filaConceptos.idconcepto=1) then
+                     select count(*) into vConteo from conceptosxcertif cc
+                     WHERE cc.idconcepto = filaConceptos.idconcepto
+                     and cc.idobra = pIdObra
+                     and cc.nrocertificado = pIdCerti;
+                     if vConteo > 0 then
+                       SELECT cc.importeacuant into vAcum FROM conceptosxcertif cc
+                       WHERE cc.idconcepto = filaConceptos.idconcepto
+                       and cc.idobra = pIdObra
+                       and cc.nrocertificado = pIdCerti;
+                     else
+                       vAcum := 0.0;
+                     end if;
+                     if (filaConceptos.idconcepto = 1) then
                        INSERT INTO CONCEPTOSXCERTIF
                        VALUES (pIdObra, pIdCerti, filaConceptos.idconcepto, vImporte, vAcum);
                      else
@@ -49,7 +61,7 @@ BEGIN
                        vPorcentaje := vPorcentaje/100.0;
                        DBMS_OUTPUT.put_line(vPorcentaje);
                        INSERT INTO CONCEPTOSXCERTIF
-                       VALUES (pIdObra, pIdCerti, filaConceptos.idconcepto, (vImporte * vPorcentaje), vAcum);
+                       VALUES (pIdObra, pIdCerti, filaConceptos.idconcepto, vAcum, (vImporte * vPorcentaje));
                      end if;
                 end loop;
             end if;
