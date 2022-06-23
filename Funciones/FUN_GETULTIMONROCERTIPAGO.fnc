@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION FUN_GETULTIMONROCERTIPAGO(pIdObra obra.idobra%type)
+CREATE OR REPLACE NONEDITIONABLE FUNCTION FUN_GETULTIMONROCERTIPAGO(pIdObra obra.idobra%type)
 RETURN certipago.nrocertificado%type
 IS
   vNroCerti certipago.nrocertificado%type;
@@ -6,7 +6,7 @@ IS
 BEGIN
   SELECT COUNT(*) INTO vCount FROM CERTIPAGO CP
   WHERE CP.IDOBRA = pIdObra;
-  IF vCount>0 THEN
+  IF vCount > 0 THEN
     SELECT MAX(CP.NROCERTIFICADO) INTO vNroCerti FROM CERTIPAGO CP
     WHERE CP.IDOBRA = pIdObra;
   ELSE
