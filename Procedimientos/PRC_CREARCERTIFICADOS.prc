@@ -27,12 +27,12 @@ BEGIN
         FROM OBRA o WHERE O.IDOBRA = vIdObra;
         --Insertar certipago, abierto = 1
         INSERT INTO CERTIPAGO 
-        VALUES(vIdObra, vNroCertiPago, CURRENT_DATE, 1, vEmpresa); 
+        VALUES(vIdObra, vNroCertiPago, TRUNC(CURRENT_DATE), 1, vEmpresa); 
         --Recuperar el ultimo numcertiobra      
         vNroCertiObra := fun_getultimonrocertiobra(vIdObra) + 1;             
         --Insertar certiobra
         INSERT INTO CERTIOBRA
-        VALUES (vIdObra, vNroCertiPago, vNroCertiObra, vIdFoja);  
+        VALUES (vIdObra, vNroCertiPago,vNroCertiObra, vIdFoja);  
         PRC_CrearConceptosXCertif(vIdObra, vIdFoja, vNroCertiPago);
         commit;
         pError := 0; --No hay error
