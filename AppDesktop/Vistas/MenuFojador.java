@@ -32,8 +32,7 @@ public class MenuFojador extends javax.swing.JFrame {
         this.con = con;
         this.sqlStmn = stmn;
         initComponents();
-        pnlCrearFoja.setVisible(false);
-        pnlCargarFoja.setVisible(false);
+        this.verPanelConsultas();
         tblListObrasModel = tblObras.getSelectionModel();
         tblListFojasModel = tblFojas.getSelectionModel();
     }
@@ -473,20 +472,11 @@ public class MenuFojador extends javax.swing.JFrame {
 
     private void itemCrearFojaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemCrearFojaActionPerformed
         this.verPanelCrearFoja();
-        try {
-            cargarTablaObras();
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, e.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
-        }
+        
     }//GEN-LAST:event_itemCrearFojaActionPerformed
 
     private void itemCargarFojaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itemCargarFojaActionPerformed
         this.verPanelCargarFoja();
-        try {
-            cargarTablaFojas();
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this, e.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
-        }
     }//GEN-LAST:event_itemCargarFojaActionPerformed
 
     private void btnCrearFojaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCrearFojaActionPerformed
@@ -584,7 +574,6 @@ public class MenuFojador extends javax.swing.JFrame {
         } else {
             
         }
-        
     }//GEN-LAST:event_itemCerrarSesionActionPerformed
 
     private void btnConsultaPorcActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConsultaPorcActionPerformed
@@ -593,7 +582,7 @@ public class MenuFojador extends javax.swing.JFrame {
             this.callSqlStmn.registerOutParameter(1, Types.DOUBLE);
             this.callSqlStmn.setInt(2, Integer.parseInt(txtNumObra.getText()));
             this.callSqlStmn.execute();
-            this.txtPorcAvance.setText(String.valueOf(this.callSqlStmn.getDouble(1)));
+            this.txtPorcAvance.setText(String.format("%.2f %%", this.callSqlStmn.getDouble(1)));
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, e.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
         }
@@ -610,15 +599,15 @@ public class MenuFojador extends javax.swing.JFrame {
             this.callSqlStmn.execute();
             switch(this.callSqlStmn.getInt(3)) {
                 case 0:
-                    txtMontoBasicoM.setText(String.valueOf(this.callSqlStmn.getDouble(4)));
-                    txtMontoRedetM.setText(String.valueOf(this.callSqlStmn.getDouble(5)));
-                    txtDiferenciaM.setText(String.valueOf(this.callSqlStmn.getDouble(5) - this.callSqlStmn.getDouble(4)));
+                    txtMontoBasicoM.setText(String.format("$ %.2f", this.callSqlStmn.getDouble(4)));
+                    txtMontoRedetM.setText(String.format("$ %.2f", this.callSqlStmn.getDouble(5)));
+                    txtDiferenciaM.setText(String.format("$ %.2f", this.callSqlStmn.getDouble(5) - this.callSqlStmn.getDouble(4)));
                     break;
                 case 1:
                     JOptionPane.showMessageDialog(this, "No existe una obra con ese número de obra.", "ERROR", JOptionPane.ERROR_MESSAGE);
                     break;
                 case 2:
-                    txtMontoBasicoM.setText(String.valueOf(this.callSqlStmn.getDouble(4)));
+                    txtMontoBasicoM.setText(String.format("$ %.2f", this.callSqlStmn.getDouble(4)));
                     txtMontoRedetM.setText("");
                     txtDiferenciaM.setText("");
                     JOptionPane.showMessageDialog(this, "La obra no tiene una redeterminación activa en esa fecha.", "ERROR", JOptionPane.WARNING_MESSAGE);
@@ -696,19 +685,29 @@ public class MenuFojador extends javax.swing.JFrame {
         this.btnCargarFoja.setEnabled(false);
     }
     
-    private void verPanelCrearFoja() {
+    public void verPanelCrearFoja() {
         this.pnlCrearFoja.setVisible(true);
         this.pnlCargarFoja.setVisible(false);
         this.pnlConsultas.setVisible(false);
+        try {
+            cargarTablaObras();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
     }
     
-    private void verPanelCargarFoja() {
+    public void verPanelCargarFoja() {
         this.pnlCrearFoja.setVisible(false);
         this.pnlCargarFoja.setVisible(true);
         this.pnlConsultas.setVisible(false);
+        try {
+            cargarTablaFojas();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
     }
     
-    private void verPanelConsultas() {
+    public void verPanelConsultas() {
         this.pnlCrearFoja.setVisible(false);
         this.pnlCargarFoja.setVisible(false);
         this.pnlConsultas.setVisible(true);

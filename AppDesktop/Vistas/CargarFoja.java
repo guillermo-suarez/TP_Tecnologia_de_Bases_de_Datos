@@ -223,6 +223,7 @@ public class CargarFoja extends javax.swing.JFrame {
     private void btnAtrasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAtrasActionPerformed
         MenuFojador vMenuF = new MenuFojador(this.con, this.sqlStmn);
         vMenuF.setVisible(true);
+        vMenuF.verPanelCargarFoja();
         this.dispose();
     }//GEN-LAST:event_btnAtrasActionPerformed
 
