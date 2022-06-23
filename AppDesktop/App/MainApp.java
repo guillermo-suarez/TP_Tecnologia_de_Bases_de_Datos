@@ -7,5 +7,4 @@ public class MainApp {
         Login ventana = new Login();
         ventana.setVisible(true);
     }
-    
 }
