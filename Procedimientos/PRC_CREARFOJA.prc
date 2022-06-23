@@ -2,6 +2,7 @@ CREATE OR REPLACE PROCEDURE PRC_CREARFOJA(pNumObra obra.numobra%type,
                                           pError OUT number,
                                           vIdFoja OUT foja.idfoja%type)
 is
+vIdObra obra.idobra%type;
 vIdUltimaFoja foja.idfoja%type;
 vHayCerti number;
 BEGIN
